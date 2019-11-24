@@ -1,0 +1,26 @@
+#!/bin/sh
+
+BGDIR=${BGDIR:-$HOME/backgrounds}
+BGSTATE=${BGSTATE:-$HOME/.feh-random-background}
+
+if [ ! -s "$BGSTATE" ]; then
+  find -L "$BGDIR" -type f -print0 | shuf -z > "$BGSTATE"
+fi
+
+next_background() {
+  # Will complain about the terminating null-character, but it won't affect it
+  BGFILE="$(sed -z '1q' < "$BGSTATE")"
+  sed -z '1d' -i "$BGSTATE"
+  if [ ! -e "$BGFILE" ]; then
+    return 1
+  else
+    feh "$@" "$BGFILE"
+    return "$?"
+  fi
+}
+
+# Drop non-background files
+if ! next_background "$@"; then
+  exec $0
+fi
+

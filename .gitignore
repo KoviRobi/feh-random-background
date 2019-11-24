@@ -1,0 +1,5 @@
+*~
+\#*#
+# For nix-build outputs
+result
+result-*
