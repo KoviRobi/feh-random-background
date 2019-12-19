@@ -9,7 +9,7 @@ fi
 
 next_background() {
   # Will complain about the terminating null-character, but it won't affect it
-  BGFILE="$(sed -z '1q' < "$BGSTATE")"
+  BGFILE="$(sed -z '1q' < "$BGSTATE" | sed 's/\x0.*//')"
   sed -z '1d' -i "$BGSTATE"
   if [ ! -e "$BGFILE" ]; then
     return 1
@@ -20,7 +20,4 @@ next_background() {
 }
 
 # Drop non-background files
-if ! next_background "$@"; then
-  exec $0
-fi
-
+while ! next_background "$@"; do :; done
