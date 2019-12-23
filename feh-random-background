@@ -5,6 +5,10 @@ BGSTATE=${BGSTATE:-$HOME/.feh-random-background}
 
 if [ ! -s "$BGSTATE" ]; then
   find -L "$BGDIR" -type f -print0 | shuf -z > "$BGSTATE"
+  if [ "$(wc -c < "$BGSTATE")" -eq 0 ]; then
+    echo "No background images to choose from"
+    exit 1
+  fi
 fi
 
 next_background() {
