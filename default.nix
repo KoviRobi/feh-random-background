@@ -1,8 +1,12 @@
-let pkgs = import <nixpkgs> {};
+let pkgs = import <nixpkgs> { };
 in
-{ stdenvNoCC ? pkgs.stdenvNoCC, lib ? pkgs.lib, coreutils ? pkgs.coreutils,
-  bash ? pkgs.bash, gnused ? pkgs.gnused, findutils ? pkgs.findutils,
-  feh ? pkgs.feh
+{ stdenvNoCC ? pkgs.stdenvNoCC
+, lib ? pkgs.lib
+, coreutils ? pkgs.coreutils
+, bash ? pkgs.bash
+, gnused ? pkgs.gnused
+, findutils ? pkgs.findutils
+, feh ? pkgs.feh
 }:
 
 stdenvNoCC.mkDerivation {

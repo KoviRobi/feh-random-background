@@ -3,7 +3,7 @@
 with lib;
 
 let
-  prog = pkgs.callPackage ./default.nix {};
+  prog = pkgs.callPackage ./default.nix { };
 
   cfg = config.services.feh-random-background;
 
@@ -96,7 +96,8 @@ in
             Type = "oneshot";
             Environment = [
               "BGDIR=${escapeShellArg cfg.imageDirectory}"
-              "BGSTATE=${escapeShellArg cfg.stateFile}" ];
+              "BGSTATE=${escapeShellArg cfg.stateFile}"
+            ];
             ExecStart = "${cfg.prog} ${flags}";
             IOSchedulingClass = "idle";
           };
