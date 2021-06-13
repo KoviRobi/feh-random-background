@@ -20,7 +20,7 @@ stdenvNoCC.mkDerivation {
     mkdir -p $out/bin
     cat <<'EOF' > $out/bin/feh-random-background
     #!${bash}/bin/bash
-    PATH="${stdenvNoCC.lib.makeBinPath [ coreutils findutils gnused feh ]}:$PATH"
+    PATH="${lib.makeBinPath [ coreutils findutils gnused feh ]}:$PATH"
     EOF
     sed 1d < $src >> $out/bin/feh-random-background
     chmod +x $out/bin/feh-random-background
