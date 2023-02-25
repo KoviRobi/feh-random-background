@@ -11,7 +11,7 @@ in
 
 stdenvNoCC.mkDerivation {
   pname = "feh-random-background";
-  version = "1.0";
+  version = "1.1";
   src = ./feh-random-background;
 
   phases = [ "installPhase" "patchPhase" ];

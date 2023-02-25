@@ -15,6 +15,8 @@ BGDIR (defaults to "$HOME/backgrounds") the directory in which to look for
 image files.
 BGSTATE (defaults to "$HOME/.feh-random-background") the state file which holds
 the not-yet-seen images.
+BGEXTENSIONRE (defaults to "png\|jpg\|jpeg\|gif\|tiff") regular expression
+matching the extensions of the files to be used as wallpapers.
 
 # Home manager systemd service
 The file `home-manager-service.nix` is usable with
@@ -24,3 +26,22 @@ work in a NixOS configuration as that uses a slightly different syntax for the
 systemd service files (probably something like
 `<nixpkgs/nixos/modules/services/x11/urxvtd.nix>` should be a good place to
 start looking for the NixOS syntax).
+
+## In flake
+
+To use this in a flake, add this input:
+
+```nix
+feh-random-background = {
+  url = github:KoviRobi/feh-random-background;
+  flake = false;
+};
+```
+
+then you can import the home manager service with:
+
+```nix
+imports = [
+  (inputs.feh-random-background + /home-manager-service.nix)
+];
+```
