@@ -35,21 +35,34 @@ in
 
       imageDirectory = mkOption {
         type = types.str;
-        example = "%h/backgrounds";
+        default = "${config.home.homeDirectory}/backgrounds";
+        example = "\${config.home.homeDirectory}/backgrounds";
         description = ''
           The directory of images from which a background should be
-          chosen. Should be formatted in a way understood by systemd,
-          e.g., '%h' is the home directory.
+          chosen. Should be formatted in a way understood by systemd.
+          Default to example.
         '';
       };
 
       stateFile = mkOption {
         type = types.str;
-        example = "%h/.feh-random-background-list";
+        default = "${config.home.homeDirectory}/.feh-random-background-list";
+        example = "\${config.home.homeDirectory}/.feh-random-background-list";
         description = ''
           The state file of the not-yet-seen random backgrounds. Should be
-          formatted in a way understood by systemd, e.g., '%h' is the home
-          directory.
+          formatted in a way understood by systemd.
+          Default to example.
+        '';
+      };
+
+      extensionRegEx = mkOption {
+        type = types.str;
+        default = "png\\|jpg\\|jpeg\\|gif\\|tiff";
+        example = "png\\|jpg\\|jpeg\\|gif\\|tiff";
+        description = ''
+          Regular expression matching the extensions of the files
+          to be used as wallpapers.
+          Default to example.
         '';
       };
 
@@ -97,6 +110,7 @@ in
             Environment = [
               "BGDIR=${escapeShellArg cfg.imageDirectory}"
               "BGSTATE=${escapeShellArg cfg.stateFile}"
+              "BGEXTENSIONRE=${escapeShellArg (escape [ "\\" ] cfg.extensionRegEx)}"
             ];
             ExecStart = "${cfg.prog} ${flags}";
             IOSchedulingClass = "idle";

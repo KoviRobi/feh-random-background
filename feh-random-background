@@ -2,9 +2,10 @@
 
 BGDIR=${BGDIR:-$HOME/backgrounds}
 BGSTATE=${BGSTATE:-$HOME/.feh-random-background}
+EXTENSIONS=${BGEXTENSIONRE:-"png\|jpg\|jpeg\|gif\|tiff"}
 
 if [ ! -s "$BGSTATE" ]; then
-  find -L "$BGDIR" -type f -print0 | shuf -z > "$BGSTATE"
+  find -L "$BGDIR" -type f -iregex ".*\.\($EXTENSIONS\)" -print0 | shuf -z > "$BGSTATE"
   if [ "$(wc -c < "$BGSTATE")" -eq 0 ]; then
     echo "No background images to choose from"
     exit 1
