@@ -1,8 +1,11 @@
 #!/bin/sh
 
+XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
 BGDIR=${BGDIR:-$HOME/backgrounds}
-BGSTATE=${BGSTATE:-$HOME/.feh-random-background}
+BGSTATE=${BGSTATE:-${XDG_CACHE_HOME}/feh-random-background}
 EXTENSIONS=${BGEXTENSIONRE:-"png\|jpg\|jpeg\|gif\|tiff"}
+FEH=$(command -v feh)
+FEHBG="${XDG_CACHE_HOME}/fehbg"
 
 if [ ! -s "$BGSTATE" ]; then
   find -L "$BGDIR" -type f -iregex ".*\.\($EXTENSIONS\)" -print0 | shuf -z > "$BGSTATE"
@@ -19,7 +22,12 @@ next_background() {
   if [ ! -e "$BGFILE" ]; then
     return 1
   else
-    feh "$@" "$BGFILE"
+    "$FEH" --no-fehbg "$@" "$BGFILE"
+    cat <<EOF >"${FEHBG}"
+#!/bin/sh
+"$FEH" --no-fehbg "$@" "$BGFILE"
+EOF
+    chmod +x "${FEHBG}"
     return "$?"
   fi
 }
