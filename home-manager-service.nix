@@ -3,17 +3,9 @@
 with lib;
 
 let
-  prog = pkgs.callPackage ./default.nix { };
+  feh-random-background = pkgs.callPackage ./default.nix { };
 
   cfg = config.services.feh-random-background;
-
-  flags = lib.concatStringsSep " " (
-    [
-      "--bg-${cfg.display}"
-    ]
-    ++ lib.optional (!cfg.enableXinerama) "--no-xinerama"
-  );
-
 in
 
 {
@@ -23,13 +15,14 @@ in
     services.feh-random-background = {
       enable = mkEnableOption "random desktop background";
 
-      prog = mkOption {
-        type = types.str;
-        default = "${prog}/bin/feh-random-background";
-        example = "\${pkgs.feh}/bin/feh";
+      command = mkOption {
+        type = types.listOf types.str;
+        default = "${pkgs.feh}/bin/feh --no-fehbg --bg-fill --no-xinerama $BGFILE";
+        example = "\${pkgs.feh}/bin/feh --no-fehbg --bg-fill --no-xinerama $BGFILE";
         description = ''
-          The program to call to set the random background. Uses the
-          environment variable BGDIR for the imageDirectory option.
+          The command to `eval`, with $BGFILE being replaced by the image,
+          $BGDIR for the image directory.
+          Defaults to example.
         '';
       };
 
@@ -40,7 +33,7 @@ in
         description = ''
           The directory of images from which a background should be
           chosen. Should be formatted in a way understood by systemd.
-          Default to example.
+          Defaults to example.
         '';
       };
 
@@ -51,7 +44,7 @@ in
         description = ''
           The state file of the not-yet-seen random backgrounds. Should be
           formatted in a way understood by systemd.
-          Default to example.
+          Defaults to example.
         '';
       };
 
@@ -62,14 +55,8 @@ in
         description = ''
           Regular expression matching the extensions of the files
           to be used as wallpapers.
-          Default to example.
+          Defaults to example.
         '';
-      };
-
-      display = mkOption {
-        type = types.enum [ "center" "fill" "max" "scale" "tile" ];
-        default = "fill";
-        description = "Display background images according to this option.";
       };
 
       interval = mkOption {
@@ -80,16 +67,6 @@ in
           The duration between changing background image, set to null
           to only set background when logging in. Should be formatted
           as a duration understood by systemd.
-        '';
-      };
-
-      enableXinerama = mkOption {
-        default = true;
-        type = types.bool;
-        description = ''
-          Will place a separate image per screen when enabled,
-          otherwise a single image will be stretched across all
-          screens.
         '';
       };
     };
@@ -112,7 +89,7 @@ in
               "BGSTATE=${escapeShellArg cfg.stateFile}"
               "BGEXTENSIONRE=${escapeShellArg (escape [ "\\" ] cfg.extensionRegEx)}"
             ];
-            ExecStart = "${cfg.prog} ${flags}";
+            ExecStart = "${feh-random-background}/bin/feh-random-background ${lib.strings.escapeShellArgs cfg.command}";
             IOSchedulingClass = "idle";
           };
 

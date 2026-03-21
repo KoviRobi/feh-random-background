@@ -1,36 +1,36 @@
-#!/bin/sh
+#!/usr/bin/env bash
 
-XDG_CACHE_HOME="${XDG_CACHE_HOME:-${HOME}/.cache}"
+XDG_DATA_HOME="${XDG_DATA_HOME:-${HOME}/.local/share}"
 BGDIR=${BGDIR:-$HOME/backgrounds}
-BGSTATE=${BGSTATE:-${XDG_CACHE_HOME}/feh-random-background}
+BGSTATE=${BGSTATE:-${XDG_DATA_HOME}/feh-random-background}
 EXTENSIONS=${BGEXTENSIONRE:-"png\|jpg\|jpeg\|gif\|tiff"}
-FEH=$(command -v feh)
-FEHBG="${XDG_CACHE_HOME}/fehbg"
 
-if [ ! -s "$BGSTATE" ]; then
-  find -L "$BGDIR" -type f -iregex ".*\.\($EXTENSIONS\)" -print0 | shuf -z > "$BGSTATE"
-  if [ "$(wc -c < "$BGSTATE")" -eq 0 ]; then
-    echo "No background images to choose from"
-    exit 1
-  fi
-fi
+mkdir -p "$BGSTATE"
 
-next_background() {
-  # Will complain about the terminating null-character, but it won't affect it
-  BGFILE="$(sed -z '1q' < "$BGSTATE" | sed 's/\x0.*//')"
-  sed -z '1d' -i "$BGSTATE"
-  if [ ! -e "$BGFILE" ]; then
-    return 1
-  else
-    "$FEH" --no-fehbg "$@" "$BGFILE"
-    cat <<EOF >"${FEHBG}"
-#!/bin/sh
-"$FEH" --no-fehbg "$@" "$BGFILE"
-EOF
-    chmod +x "${FEHBG}"
-    return "$?"
-  fi
+refill() {
+    if [ ! -s "$BGSTATE/next" ]; then
+      find -L "$BGDIR" -type f -iregex ".*\.\($EXTENSIONS\)" -print0 | shuf -z > "$BGSTATE/next"
+      if [ ! -s "$BGSTATE/next" ]; then
+        echo "No background images to choose from"
+        exit 1
+      fi
+    fi
 }
 
-# Drop non-background files
-while ! next_background "$@"; do :; done
+refill
+
+BGFILE="$(sed -z '1q' < "$BGSTATE/next" | tr -d '\0')"
+sed -z '1d' -i "$BGSTATE/next"
+
+cat >"$BGSTATE/current" <<EOF
+#!$SHELL
+BGFILE=$(printf "%q" "$BGFILE")
+$@
+EOF
+chmod +x "$BGSTATE/current"
+"$BGSTATE/current"
+EXIT="$?"
+
+refill
+
+exit "$EXIT"
