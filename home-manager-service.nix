@@ -17,12 +17,33 @@ in
 
       command = mkOption {
         type = types.listOf types.str;
-        default = "${pkgs.feh}/bin/feh --no-fehbg --bg-fill --no-xinerama $BGFILE";
-        example = "\${pkgs.feh}/bin/feh --no-fehbg --bg-fill --no-xinerama $BGFILE";
+        default = [ (lib.getExe pkgs.feh) "--no-fehbg" "--bg-fill" "--no-xinerama" "$BGFILE" ];
+        example = lib.literalMD ''
+          A command line list such as
+          ```
+          [
+            (lib.getExe pkgs.feh)
+            "--no-fehbg"
+            "--bg-fill"
+            "--no-xinerama"
+            "$BGFILE"
+          ]
+          ```
+          or for sway, I use
+          ```
+          command = [
+            (lib.getExe' pkgs.sway "swaymsg")
+            "\"output '*' bg \'$(printf '%%q' \"$BGFILE\")\' fit\""
+          ];
+          ```
+          which is a bit ugly but swaymsg seems to need the argument
+          both quoted and escaped. In this case the subshell printf
+          will ensure it is quoted -- note I have needed to use `%%`
+          to escape the `%` for systemd.unit.
+        '';
         description = ''
           The command to `eval`, with $BGFILE being replaced by the image,
           $BGDIR for the image directory.
-          Defaults to example.
         '';
       };
 
