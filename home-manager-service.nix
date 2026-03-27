@@ -17,7 +17,7 @@ in
 
       command = mkOption {
         type = types.listOf types.str;
-        default = [ (lib.getExe pkgs.feh) "--no-fehbg" "--bg-fill" "--no-xinerama" "$BGFILE" ];
+        default = [ (lib.getExe pkgs.feh) "--no-fehbg" "--bg-fill" "--no-xinerama" "\"$BGFILE\"" ];
         example = lib.literalMD ''
           A command line list such as
           ```
@@ -26,7 +26,7 @@ in
             "--no-fehbg"
             "--bg-fill"
             "--no-xinerama"
-            "$BGFILE"
+            "\"$BGFILE\""
           ]
           ```
           or for sway, I use
